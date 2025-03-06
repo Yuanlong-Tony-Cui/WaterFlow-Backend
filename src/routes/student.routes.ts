@@ -1,17 +1,8 @@
-import express, { Router, Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import express from 'express';
 import { Course } from "../models/course.model";
 import { ParamsDictionary } from 'express-serve-static-core';
 
-// Define specific types for request parameters and body
-interface CourseParams extends ParamsDictionary {
-    courseId: string;
-}
-
-interface RegisterStudentBody {
-    studentId: string;
-}
-
-const router: Router = Router();
+const router = express.Router();
 
 // Get available courses
 router.get("/courses", async (req, res) => {
@@ -22,8 +13,8 @@ router.get("/courses", async (req, res) => {
 // Register for a course
 // Register for a course
 router.post("/register/:courseId", async (
-    req: ExpressRequest<CourseParams, any, RegisterStudentBody>, 
-    res: ExpressResponse
+    req, 
+    res
 ) => {
     try {
         const { courseId } = req.params;
@@ -41,9 +32,14 @@ router.post("/register/:courseId", async (
             return res.status(404).json({ error: "Course not found" });
         }
 
-        // Check if course is full (assuming you have a max capacity field)
-        if (course.registeredStudents.length >= course.seats) {
+        // Check if the course is full (capacity limit)
+        if (course.registeredStudents.length >= course.capacity) {
             return res.status(400).json({ error: "Course is full" });
+        }
+
+        // Check if the student is already registered
+        if (course.registeredStudents.includes(studentId)) {
+            return res.status(400).json({ error: "Student is already registered for this course" });
         }
 
         // Add student to registered students
