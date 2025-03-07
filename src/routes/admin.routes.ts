@@ -3,37 +3,52 @@ import { Course } from "../models/course.model";
 
 const router = express.Router();
 
-// Create a course
-router.post("/courses", async (req, res) => {
-    try {
-        const { code, name, capacity, schedule } = req.body;
+// Helper function to validate course data
+export function validateCourseData(data: any, isUpdate = false) {
+    const { startDate, endDate, capacity, schedule } = data;
 
-        // Check for missing required fields
-        if (!code || !name || !capacity || !schedule) {
-            return res.status(400).json({ error: "Missing required fields: code, name, capacity, or schedule" });
+    // For Course creation, check required fields
+    if (!isUpdate) {
+        if (!data.code || !data.name || !data.capacity || !data.schedule) {
+            return { error: "Missing required fields: code, name, capacity, or schedule" };
         }
+    }
 
-        // Validate capacity
-        if (typeof capacity !== "number" || capacity <= 0) {
-            return res.status(400).json({ error: "Capacity must be a positive number" });
-        }
+    // Validate capacity (if provided)
+    if (capacity !== undefined && (typeof capacity !== "number" || capacity <= 0)) {
+        return { error: "Capacity must be a positive number" };
+    }
 
-        // Validate schedule
+    // Validate schedule (if provided)
+    if (schedule !== undefined) {
         if (!Array.isArray(schedule) || schedule.length === 0) {
-            return res.status(400).json({ error: "Schedule must be a non-empty array" });
+            return { error: "Schedule must be a non-empty array" };
         }
+
         const validDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
         for (const session of schedule) {
             if (!validDays.includes(session.day)) {
-                return res.status(400).json({ error: `Invalid day in schedule: ${session.day}` });
+                return { error: `Invalid day in schedule: ${session.day}` };
             }
         }
+    }
 
-        const course = new Course({
-            code, name,
-            description: req.body.description,
-            capacity, schedule
-        });
+    // Convert date (if provided)
+    const updatedData = { ...data };
+    if (startDate !== undefined) updatedData.startDate = new Date(startDate);
+    if (endDate !== undefined) updatedData.endDate = new Date(endDate);
+
+    return { data: updatedData };
+}
+
+
+// Create a course
+router.post("/courses", async (req, res) => {
+    try {
+        const { error, data } = validateCourseData(req.body, false); // `false` for creating a course
+        if (error) return res.status(400).json({ error });
+
+        const course = new Course(data);
         await course.save();
 
         res.status(201).json(course);
@@ -42,10 +57,18 @@ router.post("/courses", async (req, res) => {
     }
 });
 
-// Edit a course
-router.put("/courses/:id", async (req, res) => {
+// Edit a course (partially)
+router.patch("/courses/:id", async (req, res) => {
     try {
-        const course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const { error, data } = validateCourseData(req.body, true); // `true` for (partially) updating a course
+        if (error) return res.status(400).json({ error });
+
+        const course = await Course.findByIdAndUpdate(req.params.id, data, { new: true, runValidators: true });
+
+        if (!course) {
+            return res.status(404).json({ error: "Course not found" });
+        }
+
         res.json(course);
     } catch (err) {
         res.status(400).json({ error: (err as Error).message });

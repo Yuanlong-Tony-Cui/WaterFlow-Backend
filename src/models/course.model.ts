@@ -66,14 +66,7 @@ scheduleSchema.pre("validate", function(next) {
 
 // Define schema for make-up lectures (for extra sessions)
 const makeupLectureSchema = new mongoose.Schema({
-    date: {
-        type: String,
-        required: true,
-        validate: {
-            validator: dateValidator,
-            message: "Invalid date format. Use 'YYYY-MM-DD'."
-        }
-    }, // e.g., "2025-04-10"
+    date: { type: Date, required: true }, // e.g., "2025-04-10"
     startTime: {
         type: String, 
         required: true,
@@ -95,12 +88,14 @@ const makeupLectureSchema = new mongoose.Schema({
 const courseSchema = new mongoose.Schema({
     code: { type: String, required: true },              // e.g., "ECE 1786"
     name: { type: String, required: true },              // e.g., "Introduction to NLP"
-    description: { type: String },
+    description: { type: String, default: "" },
+    instructors: { type: [String], default: [] },        // Instructor's name
+    location: { type: String, default: "" },             // e.g., "MC 1001"
     startDate: { type: Date, required: true },           // Course start date
     endDate: { type: Date, required: true },             // Course end date
-    schedule: { type: [scheduleSchema], require: true }, // List of class hours
+    schedule: { type: [scheduleSchema], required: true }, // List of class hours
     makeupLectures: { type: [makeupLectureSchema], default: [] },
-    exceptionDates: { type: [Date], default: [] },       // Dates with no classes
+    noClassDates: { type: [Date], default: [] },         // Dates with no classes
     capacity: { type: Number, required: true },          // Max number of students allowed
     registeredStudents: { type: [String], default: [] }, // Array of student IDs
 });

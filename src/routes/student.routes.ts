@@ -1,6 +1,5 @@
 import express from 'express';
 import { Course } from "../models/course.model";
-import { ParamsDictionary } from 'express-serve-static-core';
 
 const router = express.Router();
 
@@ -12,10 +11,7 @@ router.get("/courses", async (req, res) => {
 
 // Register for a course
 // Register for a course
-router.post("/register/:courseId", async (
-    req, 
-    res
-) => {
+router.post("/register/:courseId", async (req, res) => {
     try {
         const { courseId } = req.params;
         const { studentId } = req.body;
