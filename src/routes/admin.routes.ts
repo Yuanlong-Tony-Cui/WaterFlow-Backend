@@ -3,6 +3,16 @@ import { Course } from "../models/course.model";
 
 const router = express.Router();
 
+// Get all courses
+router.get("/courses", async (req, res) => {
+    try {
+        const courses = await Course.find();
+        res.json(courses);
+    } catch (err) {
+        res.status(500).json({ error: (err as Error).message });
+    }
+});
+
 // Helper function to validate course data
 export function validateCourseData(data: any, isUpdate = false) {
     const { startDate, endDate, capacity, schedule } = data;
