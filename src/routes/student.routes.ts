@@ -10,7 +10,6 @@ router.get("/courses", async (req, res) => {
 });
 
 // Register for a course
-// Register for a course
 router.post("/register/:courseId", async (req, res) => {
     try {
         const { courseId } = req.params;
