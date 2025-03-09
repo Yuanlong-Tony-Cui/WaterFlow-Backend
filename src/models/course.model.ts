@@ -12,7 +12,7 @@ export interface ICourse extends Document {
     name: string;
     description?: string;
     location?: string;
-    instructors: string[];
+    instructor: string;
     startDate: Date;
     endDate: Date;
     schedule: ISchedule[];
@@ -116,7 +116,7 @@ const courseSchema = new mongoose.Schema<ICourse>({
     code: { type: String, required: true },              // e.g., "ECE 1786"
     name: { type: String, required: true },              // e.g., "Introduction to NLP"
     description: { type: String, default: "" },
-    instructors: { type: [String], default: [] },        // Instructor's name
+    instructor: { type: String, required: true },        // Instructor's name
     location: { type: String, default: "" },             // e.g., "MC 1001"
     startDate: { type: Date, required: true },           // Course start date
     endDate: { type: Date, required: true },             // Course end date

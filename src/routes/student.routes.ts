@@ -135,9 +135,9 @@ router.post("/withdraw/:courseId", async (req, res) => {
         if (!student || student.role !== "student") return res.status(404).json({ error: "Student not found" });
 
         // Check if student is actually registered
-        if (!course.registeredStudents.includes(new mongoose.Types.ObjectId(studentId)) || !student.registeredCourses.includes(new mongoose.Types.ObjectId(courseId))) {
-            return res.status(400).json({ error: "Student is not registered for this course" });
-        }
+        // if (!course.registeredStudents.includes(new mongoose.Types.ObjectId(studentId)) || !student.registeredCourses.includes(new mongoose.Types.ObjectId(courseId))) {
+        //     return res.status(400).json({ error: "Student is not registered for this course" });
+        // }
 
         // Remove student from the course & remove course from the student
         course.registeredStudents = course.registeredStudents.filter(id => id.toString() !== studentId);
