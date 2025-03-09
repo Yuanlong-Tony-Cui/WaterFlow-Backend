@@ -19,8 +19,17 @@ export function validateCourseData(data: any, isUpdate = false) {
 
     // For Course creation, check required fields
     if (!isUpdate) {
-        if (!data.code || !data.name || !data.capacity || !data.schedule) {
-            return { error: "Missing required fields: code, name, capacity, or schedule" };
+        if (!data.code) {
+            return { error: "Missing required field: code" };
+        }
+        if (!data.name) {
+            return { error: "Missing required field: name" };
+        }
+        if (!data.capacity) {
+            return { error: "Missing required field: capacity" };
+        }
+        if (!data.schedule) {
+            return { error: "Missing required field: schedule" };
         }
     }
 
