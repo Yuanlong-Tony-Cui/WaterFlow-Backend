@@ -1,4 +1,31 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
+
+export interface ISchedule {
+    day: string;
+    startTime: string;
+    endTime: string;
+}
+
+export interface ICourse extends Document {
+    _id: mongoose.Types.ObjectId;
+    code: string;
+    name: string;
+    description?: string;
+    location?: string;
+    instructors: string[];
+    startDate: Date;
+    endDate: Date;
+    schedule: ISchedule[];
+    exceptionDates?: Date[];
+    capacity: number;
+    makeupLectures?: {
+        date: Date;
+        startTime: string;
+        endTime: string;
+    }[];
+    noClassDates?: Date[];
+    registeredStudents: mongoose.Types.ObjectId[];
+}
 
 // Define Schedule (subdocument):
 const scheduleSchema = new mongoose.Schema({
@@ -85,7 +112,7 @@ const makeupLectureSchema = new mongoose.Schema({
     }, // e.g., "12:00 PM"
 });
 
-const courseSchema = new mongoose.Schema({
+const courseSchema = new mongoose.Schema<ICourse>({
     code: { type: String, required: true },              // e.g., "ECE 1786"
     name: { type: String, required: true },              // e.g., "Introduction to NLP"
     description: { type: String, default: "" },
@@ -97,7 +124,7 @@ const courseSchema = new mongoose.Schema({
     makeupLectures: { type: [makeupLectureSchema], default: [] },
     noClassDates: { type: [Date], default: [] },         // Dates with no classes
     capacity: { type: Number, required: true },          // Max number of students allowed
-    registeredStudents: { type: [String], default: [] }, // Array of student IDs
+    registeredStudents: { type: [mongoose.Schema.Types.ObjectId], ref: "User", default: [] },
 });
 
 // Use a virtual field to calculate available spots
