@@ -56,10 +56,6 @@ function timeValidator(value: string) {
     return /^([0-9]{1,2}):([0-9]{2})\s?(AM|PM)?$/.test(value); // matches "2:30 PM" or "14:30"
 }
 
-function dateValidator(value: string) {
-    return /^\d{4}-\d{2}-\d{2}$/.test(value); // matches "2025-04-10"
-}
-
 // Pre-save validation to ensure startTime is before endTime
 scheduleSchema.pre("validate", function(next) {
     const schedule = this as any;

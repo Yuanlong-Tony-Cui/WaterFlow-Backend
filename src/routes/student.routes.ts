@@ -75,11 +75,10 @@ router.post("/register/:courseId", async (req, res) => {
 export function getScheduleConflicts(registeredCourses: ICourse[], newCourse: ICourse): ICourse[] {
     return registeredCourses.filter((registeredCourse) =>
         registeredCourse.schedule.some((registeredSession) =>
-            newCourse.schedule.some(
-                (newSession) =>
-                    registeredSession.day === newSession.day &&
-                    timesOverlap(registeredSession.startTime, registeredSession.endTime, newSession.startTime, newSession.endTime)
-            )
+            newCourse.schedule.some((newSession) => (
+                registeredSession.day === newSession.day &&
+                timesOverlap(registeredSession.startTime, registeredSession.endTime, newSession.startTime, newSession.endTime)
+            ))
         )
     );
 }
